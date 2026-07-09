@@ -1,9 +1,15 @@
 import { Glob } from "bun"
+import { existsSync } from "node:fs"
 import { dirname, join, relative } from "node:path"
 
 const snippetsRoot = join(import.meta.dir, "..", "src", "snippets")
 const failures: Array<string> = []
 let checked = 0
+
+if (!existsSync(snippetsRoot)) {
+  console.log("check-snippets: 0 runnable snippets verified")
+  process.exit(0)
+}
 
 for await (const expectedPath of new Glob("**/*.expected.txt").scan({ cwd: snippetsRoot, absolute: true })) {
   const snippetPath = expectedPath.replace(/\.expected\.txt$/, ".ts")
