@@ -5,6 +5,7 @@ import { evo } from "foldkit/struct"
 import { toString } from "foldkit/url"
 
 import * as Dialog from "@/components/ui/dialog"
+import * as Sheet from "@/components/ui/sheet"
 
 import { legacyRedirects } from "../content/registry"
 import { isSidebarGroupOpen, readSidebarGroups, SidebarGroups, writeSidebarGroups } from "../layout/sidebarStorage"
@@ -17,6 +18,7 @@ import {
   CompletedNavigateInternal,
   CompletedSaveSidebarGroups,
   CompletedSaveThemePreference,
+  GotMobileNavigationMessage,
   GotSearchCommandMessage,
   GotSearchDialogMessage,
   GotSidebarGroups,
@@ -43,18 +45,22 @@ export const update = (model: Model, message: Message): Update =>
       ChangedUrl: ({ url }) => {
         const route = urlToRoute(url)
         const redirectTarget = legacyRedirects.get(toPath(route))
-        return redirectTarget === undefined
-          ? [
-              evo(model, {
-                route: () => route,
-                url: () => url,
-                isMobileNavOpen: () => false,
-                isMobileTocOpen: () => false,
-                maybeActiveSectionId: () => Option.none(),
-              }),
-              [],
-            ]
-          : [model, [RedirectLegacy({ url: redirectTarget })]]
+        if (redirectTarget !== undefined) {
+          return [model, [RedirectLegacy({ url: redirectTarget })]]
+        }
+        const [nextMobileNavigation, mobileNavigationCommands] = Sheet.close(model.mobileNavigation)
+        return [
+          evo(model, {
+            route: () => route,
+            url: () => url,
+            mobileNavigation: () => nextMobileNavigation,
+            isMobileTocOpen: () => false,
+            maybeActiveSectionId: () => Option.none(),
+          }),
+          mapMessages(mobileNavigationCommands, (childMessage) =>
+            GotMobileNavigationMessage({ message: childMessage }),
+          ),
+        ]
       },
       PressedSearchShortcut: () => {
         if (model.searchDialog.isOpen) {
@@ -88,8 +94,18 @@ export const update = (model: Model, message: Message): Update =>
       GotSearchCommandMessage: ({ message: childMessage }) => {
         const [command, commands, maybeOut] = SearchCommand.update(model.searchCommand, childMessage)
         const forwarded = mapMessages(commands, (child) => GotSearchCommandMessage({ message: child }))
+        const commandJustDismissed = model.searchCommand.isOpen && !command.isOpen
         return Option.match(maybeOut, {
-          onNone: () => [evo(model, { searchCommand: () => command }), forwarded],
+          onNone: (): Update => {
+            if (commandJustDismissed) {
+              const [dialog, closeCommands] = Dialog.close(model.searchDialog)
+              return [
+                evo(model, { searchCommand: () => command, searchDialog: () => dialog }),
+                [...forwarded, ...mapMessages(closeCommands, (child) => GotSearchDialogMessage({ message: child }))],
+              ]
+            }
+            return [evo(model, { searchCommand: () => command }), forwarded]
+          },
           onSome: (out): Update => {
             const [dialog, closeCommands] = Dialog.close(model.searchDialog)
             return [
@@ -102,6 +118,27 @@ export const update = (model: Model, message: Message): Update =>
             ]
           },
         })
+      },
+      ClickedMobileNavigationTrigger: () => {
+        const [nextMobileNavigation, mobileNavigationCommands] = Sheet.open(model.mobileNavigation)
+        return [
+          evo(model, { mobileNavigation: () => nextMobileNavigation }),
+          mapMessages(mobileNavigationCommands, (childMessage) =>
+            GotMobileNavigationMessage({ message: childMessage }),
+          ),
+        ]
+      },
+      GotMobileNavigationMessage: ({ message: mobileNavigationMessage }) => {
+        const [nextMobileNavigation, mobileNavigationCommands] = Sheet.update(
+          model.mobileNavigation,
+          mobileNavigationMessage,
+        )
+        return [
+          evo(model, { mobileNavigation: () => nextMobileNavigation }),
+          mapMessages(mobileNavigationCommands, (childMessage) =>
+            GotMobileNavigationMessage({ message: childMessage }),
+          ),
+        ]
       },
       ClickedCopyCode: ({ source }) => [evo(model, { copiedCode: () => Option.some(source) }), [CopyCode({ source })]],
       CompletedCopyCode: ({ source }) => [model, [ScheduleClearCopiedCode({ source })]],
@@ -129,7 +166,6 @@ export const update = (model: Model, message: Message): Update =>
         evo(model, { maybeActiveSectionId: () => Option.some(sectionId), isMobileTocOpen: () => false }),
         [],
       ],
-      ToggledMobileNav: ({ isOpen }) => [evo(model, { isMobileNavOpen: () => isOpen }), []],
       CompletedApplyTheme: () => [model, []],
       CompletedSaveThemePreference: () => [model, []],
       CompletedSaveSidebarGroups: () => [model, []],

@@ -119,6 +119,7 @@ export const mobileTableOfContents = (
                     [
                       h.Href(`#${entry.id}`),
                       h.OnClick(ClickedMobileTableOfContentsLink({ sectionId: entry.id })),
+                      ...(activeEntry ? [h.AriaCurrent("location")] : []),
                       h.Class(
                         cn(
                           "flex items-center justify-between px-4 py-3 sm:px-6",

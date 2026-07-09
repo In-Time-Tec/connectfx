@@ -9,6 +9,7 @@ import {
   breadcrumbPage,
   breadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { button } from "@/components/ui/button"
 import { separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
@@ -48,19 +49,17 @@ const sidebarGroup = (group: NavGroup, path: string, openGroups: Model["openSide
   return h.li(
     [],
     [
-      h.button(
-        [
-          h.DataAttribute("sidebar-group", group.title),
-          h.AriaExpanded(open),
-          h.AriaControls(panelId),
-          ...(locked ? [h.AriaDisabled(true)] : [h.OnClick(ToggledSidebarGroup({ group: group.title }))]),
-          h.Class(
-            cn(
-              "flex w-full items-center justify-between rounded-md px-2.5 py-2 text-xs font-semibold tracking-wider text-gray-600 uppercase transition dark:text-gray-400",
-              locked ? "cursor-default" : "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800",
-            ),
+      button(
+        {
+          variant: "ghost",
+          onClick: locked ? undefined : ToggledSidebarGroup({ group: group.title }),
+          isDisabled: locked,
+          class: cn(
+            "h-auto w-full justify-between px-2.5 py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase",
+            locked && "cursor-default opacity-100",
           ),
-        ],
+          attributes: [h.DataAttribute("sidebar-group", group.title), h.AriaExpanded(open), h.AriaControls(panelId)],
+        },
         [
           h.span([], [group.title]),
           locked ? h.empty : h.span([h.Class(cn(open && "rotate-180"))], [chevronDown("size-3")]),

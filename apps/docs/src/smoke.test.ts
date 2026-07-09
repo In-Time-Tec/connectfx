@@ -83,6 +83,40 @@ test("theme selector persists dark mode", async () => {
   expect(document.documentElement.classList.contains("dark")).toBe(true)
   expect(localStorage.getItem("theme-preference")).toBe('"Dark"')
 })
+test("mobile navigation uses the FoldCN sheet", async () => {
+  bootAt("/docs/start/overview")
+  await settle()
+  ;(document.querySelector('button[aria-label="Open navigation"]') as HTMLButtonElement).click()
+  await settle()
+  const sheetContent = document.querySelector('[data-slot="sheet-content"]')
+  expect(sheetContent).not.toBeNull()
+  expect(sheetContent?.classList.contains("md:hidden")).toBe(false)
+  expect(document.querySelector('[data-slot="sheet-title"]')?.textContent).toBe("Connectfx")
+  ;(document.querySelector('[data-slot="sheet-close"]') as HTMLButtonElement).click()
+  await settle()
+  expect(document.querySelector('[data-slot="sheet-content"]')).toBeNull()
+})
+test("search closes with one Escape", async () => {
+  bootAt("/")
+  await settle()
+  ;(document.querySelector('button[aria-label="Search docs"]') as HTMLButtonElement).click()
+  await settle()
+  const input = document.querySelector('[data-slot="command-input"]') as HTMLInputElement
+  input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+  await settle()
+  expect(document.querySelector('[data-slot="dialog-content"]')).toBeNull()
+})
+test("search reports empty results", async () => {
+  bootAt("/")
+  await settle()
+  ;(document.querySelector('button[aria-label="Search docs"]') as HTMLButtonElement).click()
+  await settle()
+  const input = document.querySelector('[data-slot="command-input"]') as HTMLInputElement
+  input.value = "no-such-connectfx-page"
+  input.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: "x" }))
+  await settle()
+  expect(document.querySelector('[role="status"]')?.textContent).toContain("No results")
+})
 const assertPagesRender = async (pages: ReadonlyArray<(typeof allPages)[number]>): Promise<void> => {
   const [page, ...rest] = pages
   if (page === undefined) return
