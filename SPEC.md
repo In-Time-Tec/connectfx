@@ -1,6 +1,6 @@
 # ConnectFX Specification Index
 
-ConnectFX is an embedded-first, Effect-native framework for durable external-system Connections. Consumers compose it into their own application, persistence, authorization boundary, and deployment.
+ConnectFX helps teams safely connect their product to external systems and keep those Connections working over time. Consumers compose it into their own application, persistence, authorization boundary, and deployment.
 
 ## How to read this tree
 
@@ -68,9 +68,9 @@ SPEC.md
 6. Connection health includes grants, scopes, installations, subscriptions, and capabilities, not only token validity.
 7. Event ingress verifies, deduplicates, records, and acknowledges before durable work.
 8. Managed resources and reconciliation are optional capabilities over Connections.
-9. The runtime owns durable operation state; Provider kits do not persist private orchestration engines.
+9. Effect Workflow owns execution attempts, timers, replay, and wakeups; ConnectFX Operation storage owns admission, idempotency, requested cancellation, administrator response, and observable result projection.
 10. Microsoft is the first deep provider but does not define core ontology.
-11. Relay owns communication and BatonFX owns agent execution.
+11. ConnectFX owns provider-local convergence; Relay owns cross-system product workflow sequencing and may wait on a black-box OperationId.
 12. Every behavior-bearing service and Provider kit exposes deterministic test layers.
 
 ## Spec maintenance rules

@@ -23,3 +23,7 @@ A Connection has one stable local identity even when credentials rotate, scopes 
 An Installation is a provider-side application presence. It may be part of a Connection but is not the Connection itself. An Event subscription and Managed resource likewise have their own provider identity and lifecycle.
 
 Subject identifiers are opaque host values. Core does not define people, organizations, Agents, tenants, or accounts.
+
+A Connection is the primary primitive. It is not a token, login, Session, or authentication account. The host authenticates and authorizes before passing its opaque Subject to ConnectFX.
+
+Provider-specific capabilities preserve Slack, Microsoft, GitHub, AWS, and database semantics. Core standardizes their lifecycle boundaries; it does not erase them into universal resource or operation types.

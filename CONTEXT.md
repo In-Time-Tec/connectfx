@@ -4,7 +4,7 @@ This file is the canonical vocabulary for ConnectFX. `SPEC.md` indexes the detai
 
 ## Positioning
 
-ConnectFX is an embedded-first, Effect-native framework for durable external-system Connections. It begins with a Microsoft provider kit but keeps provider-specific identities, credentials, permissions, resources, and APIs outside core.
+ConnectFX helps teams safely connect their product to external systems and keep those Connections working over time. Better Auth/AuthFX connects people to the product; ConnectFX connects the product to external systems. It is embedded-first, Effect-native, and owns the infrastructure needed for durable provider access.
 
 ## Language
 
@@ -61,8 +61,12 @@ A Provider-side object whose desired and observed state ConnectFX reconciles thr
 _Avoid_: Connection, capability
 
 **Reconciliation**:
-The durable process of inspecting desired and observed Managed resource state, planning changes, applying them, and verifying convergence.
+Convergence of one Connection's Managed resource against provider facts by inspecting desired and observed state, planning changes, applying them, and verifying the result.
 _Avoid_: Provision command, sync
+
+**Operation**:
+A durable, observable admission and result record for provider work. Its `OperationId` is the black-box handle exposed to callers and Relay.
+_Avoid_: Workflow step, job
 
 **Administrator action**:
 An explicit external step a Provider administrator must complete before an operation can continue.
@@ -79,6 +83,8 @@ _Avoid_: Failure, manual workaround
 - Provider mutations declare idempotency and eventual-consistency behavior.
 - Event ingress verifies, deduplicates, records, and acknowledges before durable processing.
 - Managed resources are optional; simple Connections do not require the reconciliation runtime.
+- Relay sequences product intent across Connections, resources, agents, communications, and human decisions; it does not own or mirror provider-local convergence steps.
+- ConnectFX is not an ORM, ETL engine, general workflow engine, general IaC system, or agent tool catalog.
 - Every behavior-bearing service has a test or memory layer.
 - New durable concepts require a feature document; stable decisions require an ADR.
 

@@ -10,13 +10,14 @@ Plus-One contains production-proven Microsoft integration depth across delegated
 
 ## Decision
 
-The first Provider kit is Microsoft. Extraction proceeds through credential runtime, Graph subscriptions, shared mailbox reconciliation, organization consent, and Teams infrastructure. Microsoft-specific concepts remain inside the package and do not define core.
+The first Provider kit is Microsoft, but implementation proceeds through evidence gates: credentials/client and one read-only Graph operation; durable Graph subscription/inbox; then one shared-mailbox resource. Organization consent, Entra, Teams, and Bot breadth follow only when product evidence requires them. Microsoft-specific concepts remain inside the package and do not define core. A materially different second provider validates stable extension points before v1.
 
 ## Consequences
 
 - Plus-One is the first consumer and acceptance environment.
 - Provider abstractions remain provisional until a second real kit validates them.
 - Microsoft resource definitions may be richer than core without forcing false generic equivalents.
+- Broad Microsoft coverage and the full issue backlog are not v1 gates.
 
 ## Rejected alternatives
 

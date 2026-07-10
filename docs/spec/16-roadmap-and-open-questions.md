@@ -1,18 +1,30 @@
 # Roadmap And Open Questions
 
-## Initial implementation sequence
+## Evidence gates
 
-1. Core Connection, Subject, Provider, Credential profile, Grant, and health schemas.
-2. Memory stores, vault, and provider conformance harness.
-3. Provider registry and Connection lifecycle services.
-4. Authorization transaction and credential lifecycle services.
-5. Microsoft Graph client and application credential slice.
-6. Graph event subscription lifecycle.
-7. Durable runtime and SQL store.
-8. Shared mailbox managed resource.
-9. Organization consent and installation.
-10. Teams and bot infrastructure.
-11. Plus-One migration and end-to-end verification.
+### Alpha
+
+- Minimal `@connectfx/core`, `@connectfx/microsoft`, and `@connectfx/testing` packages.
+- Microsoft credential acquisition/client support and one read-only Graph operation.
+- Deterministic tests and a Plus-One adapter over existing persistence and vault.
+
+### Beta
+
+- Durable Graph subscription and inbox path.
+- Verified ingress persists and deduplicates a delivery before acknowledgement.
+- Effect Workflow and Operation projection responsibilities are proven without duplicate retry state.
+
+### Release candidate
+
+- One concrete shared-mailbox resource converges against provider facts.
+- Destructive-change and ambiguous-outcome behavior is proven.
+- No universal generic reconciliation API is required.
+
+### v1
+
+- A second, materially different provider validates stable core capability extension points.
+- Production, security, package, conformance, and migration gates pass.
+- Teams, Entra, Bot breadth, and completion of the entire issue backlog are not prerequisites.
 
 ## Later candidates
 
@@ -24,10 +36,10 @@
 - Consumer-facing connection UI adapters.
 - Multi-dialect Effect SQL store.
 
-## Open questions
+## Open questions and gates
 
-- Whether simple authorization flows live in core or a separate runtime package.
-- Whether Connection events use an explicit event log or current-state rows plus outbox.
-- Which second provider should validate Provider kit and Grant abstractions.
-- Which Microsoft resource slice first requires destructive-change approval.
-- Whether low-level OAuth standards helpers should be shared with AuthFX through an independent standards package or duplicated behind each domain contract.
+- **Second provider selection — product owner, before v1 planning:** choose a provider materially different from Microsoft and name the core contracts it must test.
+- **Connection event persistence — runtime owner, before beta schema freeze:** choose an event log or current-state plus outbox from measured inbox and projection needs.
+- **OAuth helper sharing — core owner, after two implementations:** share through an independent standards package only if duplicated standards behavior is demonstrated; ConnectFX never imports AuthFX.
+
+Issue cleanup is planning hygiene, not a release gate. Package additions and broader Microsoft capabilities require evidence from an owning milestone.

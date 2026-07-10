@@ -4,7 +4,7 @@
 
 ## Purpose
 
-ConnectFX is an embedded-first, Effect-native framework for durable external-system Connections. The first provider is Microsoft, with an initial extraction path through credentials, health, Graph subscriptions, shared mailboxes, organization consent, and Teams application infrastructure.
+ConnectFX helps teams safely connect their product to external systems and keep those Connections working over time. It is embedded-first, Effect-native, and infrastructure-owning. The first evidence path is deliberately narrow: Microsoft credentials and Graph before broader provider infrastructure.
 
 ## Repository Layout
 
@@ -22,8 +22,10 @@ ConnectFX is an embedded-first, Effect-native framework for durable external-sys
 - ConnectFX is Effect-native: public operations return `Effect` or `Stream`; services compose through `Layer`; boundary values use Effect Schema; durable orchestration uses Effect Workflow where specified.
 - Core is provider-neutral and host-neutral. Microsoft and other provider implementations live in optional packages.
 - ConnectFX does not authenticate callers. Consumers authorize a Subject before invoking connection operations.
-- ConnectFX does not own Relay communication, Baton agent execution, or product authority.
+- ConnectFX owns convergence of one Connection or provider resource against provider facts. Relay owns cross-system product workflow sequencing and may wait on an opaque OperationId, but never mirrors ConnectFX steps.
+- ConnectFX never imports AuthFX, Relay, BatonFX, FoldKit, or FoldCN.
 - Provider clients, webhooks, credentials, and quirks are confined to Provider kits.
+- Prefer capability-specific registrations and layers; do not grow a giant optional ProviderKit interface.
 - Every behavior-bearing service exposes a test or memory layer and provider kits satisfy conformance tests.
 - No code comments. Architectural rationale belongs in specs and ADRs.
 - Use Bun, Turbo, Vitest with `@effect/vitest`, plain oxlint, ast-grep, and Prettier.

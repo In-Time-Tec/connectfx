@@ -1,8 +1,10 @@
 # ConnectFX
 
-The Effect-native framework for connecting applications to external systems.
+Safely connect your product to external systems and keep those Connections working over time.
 
 ConnectFX manages durable Connections, Credentials, Grants, provider installations, health, event subscriptions, and optional managed-resource reconciliation. Its first provider kit is Microsoft, extracted from the organization onboarding and provisioning work proven in Plus-One.
+
+Better Auth/AuthFX connects people to your product. ConnectFX starts after the host authenticates and authorizes: it assigns a durable Connection to an opaque Subject and manages provider access over time.
 
 ## Status
 
@@ -16,6 +18,9 @@ ConnectFX is specification-first and pre-implementation. The repository currentl
 - Provider kits own authorization, credentials, clients, webhooks, and quirks.
 - Managed resources are optional capabilities over a Connection.
 - Host applications own authentication and product authorization.
+- Relay owns workflows that sequence intent across systems; ConnectFX owns provider-local convergence.
+
+Use ConnectFX for persistent access with credentials, consent, installations, refresh, webhooks, subscriptions, health, or recovery—not for every HTTP API. It is not an ORM, ETL engine, general workflow engine, IaC system, or agent tool catalog.
 
 ## Commands
 

@@ -10,18 +10,20 @@ Authorization, refresh, revocation, subscription renewal, rollout, and reconcili
 
 ## Decision
 
-ConnectFX runtime owns the durable Operation model, canonical rows, progress, retries, waits, cancellation boundaries, and repair. Effect Workflow coordinates execution over that truth. Provider kits contribute idempotent activities and provider-specific inspection and mutation behavior.
+Effect Workflow is authoritative for execution attempts, timers, activity replay, retries, and wakeups. ConnectFX Operation storage is authoritative for admission and idempotency, requested cancellation and Administrator response, and observable status/result projection. It does not duplicate Workflow retry or step state. Provider kits contribute idempotent activities and provider-specific inspection and mutation behavior.
 
 ## Consequences
 
 - Operations have one observable lifecycle across providers.
 - Provider packages must declare idempotency and ambiguous-outcome handling.
 - Consumers may run API and workers separately over shared state without operating a separate ConnectFX service.
+- Provider mutations inspect before repeat after ambiguous outcomes.
 
 ## Rejected alternatives
 
 - **Provider-local workflow engines:** rejected because durability and repair behavior would fragment.
 - **In-memory queues and SDK retries:** rejected because accepted work would be lost on process failure.
+- **A second retry and step state machine in Operation rows:** rejected because two authorities would diverge during replay and repair.
 
 ## Related docs
 
